@@ -3,7 +3,7 @@ services:
   - docker
 script:
 - make build
-- test -f bin/linux_amd64/myapp
+- test -f bin/linux_amd64/otowari
 - make all-container
-- docker images | grep "^thockin/myapp.*__linux_amd64"
+- docker images | grep "^thockin/otowari.*__linux_amd64"
 - make test
