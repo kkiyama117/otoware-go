@@ -1,0 +1,5 @@
+FROM golang:latest
+
+USER 65535:65535
+
+ENTRYPOINT ["/{ARG_BIN}"]
