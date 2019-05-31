@@ -5,3 +5,5 @@
 /.dockerfile-*
 
 /.idea
+
+/data/*
