@@ -1,15 +1,16 @@
-package main
+package otowari
 
 import (
-	"github.com/gordonklaus/portaudio"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
 	"os/signal"
+
+	"github.com/gordonklaus/portaudio"
 )
 
-func main() {
+func Otowari() {
 	if len(os.Args) < 2 {
 		fmt.Println("missing required argument:  input file name")
 		return
@@ -21,17 +22,17 @@ func main() {
 
 	fileName := os.Args[1]
 	f, err := os.Open(fileName)
-	chk(err)
+	Chk(err)
 	defer f.Close()
 
 	id, data, err := readChunk(f)
-	chk(err)
+	Chk(err)
 	if id.String() != "FORM" {
 		fmt.Println("bad file format")
 		return
 	}
 	_, err = data.Read(id[:])
-	chk(err)
+	Chk(err)
 	if id.String() != "AIFF" {
 		fmt.Println("bad file format")
 		return
@@ -43,10 +44,10 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		chk(err)
+		Chk(err)
 		switch id.String() {
 		case "COMM":
-			chk(binary.Read(chunk, binary.BigEndian, &c))
+			Chk(binary.Read(chunk, binary.BigEndian, &c))
 		case "SSND":
 			chunk.Seek(8, 1) //ignore offset and block
 			audio = chunk
@@ -61,10 +62,10 @@ func main() {
 	defer portaudio.Terminate()
 	out := make([]int32, 8192)
 	stream, err := portaudio.OpenDefaultStream(0, 1, 44100, len(out), &out)
-	chk(err)
+	Chk(err)
 	defer stream.Close()
 
-	chk(stream.Start())
+	Chk(stream.Start())
 	defer stream.Stop()
 	for remaining := int(c.NumSamples); remaining > 0; remaining -= len(out) {
 		if len(out) > remaining {
@@ -74,8 +75,8 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		chk(err)
-		chk(stream.Write())
+		Chk(err)
+		Chk(stream.Write())
 		select {
 		case <-sig:
 			return
@@ -119,7 +120,7 @@ type commonChunk struct {
 	SampleRate    [10]byte
 }
 
-func chk(err error) {
+func Chk(err error) {
 	if err != nil {
 		panic(err)
 	}
